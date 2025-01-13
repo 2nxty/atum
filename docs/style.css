@@ -1,0 +1,105 @@
+#age-verification {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #1c1c1c;
+  -webkit-transition: 500ms;
+  transition: 500ms;
+  z-index: 90000001;
+  
+  display: none;
+}
+
+.montserrat-<uniquifier> {
+  font-family: "Montserrat", serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.age-verification-main {
+  background-color: #842f2f;
+  font-family: "Montserrat", sans-serif;
+  color: white;
+  font-size: 13pt;
+  text-align: center;
+  padding: 25px;
+  border-radius: 15px;
+  position: relative;
+  top: 10px;
+  width: 500px;
+  max-width: 80%;
+  margin: 0 auto;
+  -webkit-box-shadow: 1px 2px 9px 0px rgba(0,0,0,0.3);
+  -moz-box-shadow: 1px 2px 9px 0px rgba(0,0,0,0.3);
+  box-shadow: 1px 2px 9px 0px rgba(0,0,0,0.3);
+}
+@media only screen and (min-height: 400px) {
+  .age-verification-main {
+    top: 40%;
+  }
+}
+
+.age-title, .age-main-text {
+  display: block;
+  margin-bottom: 1em;
+}
+.age-title {
+  font-size: 24pt;
+  margin-bottom: 0.5em;
+}
+
+.age-button {
+  -webkit-box-shadow: 1px 2px 9px 0px rgba(0,0,0,0.3);
+  -moz-box-shadow: 1px 2px 9px 0px rgba(0,0,0,0.3);
+  box-shadow: 1px 2px 9px 0px rgba(0,0,0,0.3);
+}
+
+.age-button {
+  font-family: "Montserrat", sans-serif;
+  background-color: #1c1c1c;
+  border: none;
+  font-size: 16pt;
+  
+  color: #e68d91;
+  border-radius: 15px;
+  display: inline-block;
+  width: 150px;
+  padding: 10px;
+  margin: 5px 10px;
+}
+
+.age-credits {
+  /** credits are not required, but are appreciated **/
+  font-family: "Montserrat", sans-serif;
+  color: white;
+  display: block;
+  font-size: 12px;
+  text-decoration: normal;
+  text-align: right;
+  margin-top: 20px;
+  margin-bottom: -15px;
+}
+.age-credits a {
+  color: white;
+}
+
+.cont {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.caption {
+    display: block;
+}
+
+.sy {
+  margin-top: 10px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 20px;
+}
