@@ -1,1 +1,358 @@
-hi
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteador</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f9e1e6, #a7e8e3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            overflow: auto;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            margin: 20px;
+        }
+        .banner {
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        .banner img {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 15px;
+            border: 3px solid #39c5bb;
+            box-shadow: 0 5px 15px rgba(57, 197, 187, 0.3);
+        }
+        h1 {
+            font-size: 28px;
+            color: #ff6b81;
+            margin-bottom: 25px;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+            color: #ff6b81;
+            font-weight: 600;
+        }
+        .tab.active {
+            background: #ff6b81;
+            color: #fff;
+        }
+        .tab:hover {
+            background: rgba(255, 107, 129, 0.7);
+            color: #fff;
+        }
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+        textarea, input[type="number"] {
+            padding: 15px;
+            border: 2px solid #ffb6c1;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 25px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        textarea {
+            width: 90%;
+            height: 120px;
+            resize: none;
+        }
+        .number-inputs {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        input[type="number"] {
+            width: 48%;
+            box-sizing: border-box;
+        }
+        textarea:focus, input[type="number"]:focus {
+            border-color: #39c5bb;
+            box-shadow: 0 0 10px rgba(57, 197, 187, 0.3);
+        }
+        button {
+            background: linear-gradient(45deg, #ff6b81, #ff8e9b);
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 107, 129, 0.4);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .overlay.active {
+            display: flex;
+        }
+        .overlay-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            transform: scale(0.7);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            border: 2px solid #39c5bb;
+        }
+        .overlay.active .overlay-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        #result {
+            font-size: 52px;
+            color: #ff6b81;
+            font-weight: 600;
+            min-height: 70px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .roulette {
+            animation: roulette 0.3s ease-in-out infinite;
+        }
+        @keyframes roulette {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            50% { transform: translateY(-15px) scale(1.1); opacity: 0.7; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .winner {
+            animation: winner 1s ease forwards;
+        }
+        @keyframes winner {
+            0% { transform: scale(1); color: #ff6b81; }
+            50% { transform: scale(1.2); color: #39c5bb; }
+            100% { transform: scale(1); color: #ff6b81; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="banner">
+            <img src="https://media1.tenor.com/m/-ZZKSC9-aMEAAAAC/miku-hatsune-miku.gif" alt="Hatsune Miku GIF">
+        </div>
+        <h1>Sorteador Miku Beam</h1>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('names')">Sortear Nomes</div>
+            <div class="tab" onclick="switchTab('numbers')">Sortear Números</div>
+        </div>
+        <div id="names-tab" class="tab-content active">
+            <textarea id="names" placeholder="Digite os nomes, um por linha..."></textarea>
+            <button id="drawNamesButton" onclick="startNamesDraw()">Sortear</button>
+        </div>
+        <div id="numbers-tab" class="tab-content">
+            <div class="number-inputs">
+                <input type="number" id="minNumber" placeholder="Mínimo" step="1">
+                <input type="number" id="maxNumber" placeholder="Máximo" step="1">
+            </div>
+            <button id="drawNumbersButton" onclick="startNumbersDraw()">Sortear</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeOverlay(event)">
+        <div class="overlay-content" onclick="event.stopPropagation()">
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <audio id="drawAudio" src="beam.mp3"></audio>
+
+    <script>
+        let lastNameWinner = null;
+        let lastNumberWinner = null;
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}-tab`).classList.add('active');
+        }
+
+        function startNamesDraw() {
+            const namesInput = document.getElementById('names').value.trim();
+            const resultDiv = document.getElementById('result');
+            const drawButton = document.getElementById('drawNamesButton');
+            const overlay = document.getElementById('overlay');
+            const audio = document.getElementById('drawAudio');
+            
+            if (!namesInput) {
+                alert('Por favor, insira pelo menos um nome!');
+                return;
+            }
+
+            let names = namesInput.split('\n').map(name => name.trim()).filter(name => name);
+            if (names.length === 0) {
+                alert('Nenhum nome válido inserido!');
+                return;
+            }
+
+            if (lastNameWinner && names.length > 1) {
+                names = names.filter(name => name !== lastNameWinner);
+            }
+
+            drawButton.disabled = true;
+            audio.volume = 0.1; // Set volume to 10%
+            audio.play(); // Start audio immediately
+
+            // Show overlay immediately with "Sorteando..."
+            overlay.classList.add('active');
+            resultDiv.textContent = 'Sorteando...';
+            resultDiv.classList.add('roulette');
+            resultDiv.classList.remove('winner');
+
+            // Delay the shuffle by 5 seconds
+            setTimeout(() => {
+                let shuffleCount = 0;
+                const shuffleInterval = setInterval(() => {
+                    const randomName = names[Math.floor(Math.random() * names.length)];
+                    resultDiv.textContent = randomName;
+                    shuffleCount++;
+                    if (shuffleCount >= 100) {
+                        clearInterval(shuffleInterval);
+                    }
+                }, 50);
+
+                // Reveal winner after another 5 seconds (total 10 seconds from click)
+                setTimeout(() => {
+                    clearInterval(shuffleInterval);
+                    const winner = names[Math.floor(Math.random() * names.length)];
+                    lastNameWinner = winner;
+                    resultDiv.textContent = `Sorteado: ${winner}!`;
+                    resultDiv.classList.remove('roulette');
+                    resultDiv.classList.add('winner');
+                    drawButton.disabled = false;
+                    audio.pause(); // Stop audio when winner is revealed
+                    audio.currentTime = 0; // Reset audio for next play
+                }, 5000);
+            }, 10000);
+        }
+
+        function startNumbersDraw() {
+            const minNumber = parseInt(document.getElementById('minNumber').value);
+            const maxNumber = parseInt(document.getElementById('maxNumber').value);
+            const resultDiv = document.getElementById('result');
+            const drawButton = document.getElementById('drawNumbersButton');
+            const overlay = document.getElementById('overlay');
+            const audio = document.getElementById('drawAudio');
+
+            if (isNaN(minNumber) || isNaN(maxNumber)) {
+                alert('Por favor, insira valores numéricos válidos!');
+                return;
+            }
+
+            if (minNumber > maxNumber) {
+                alert('O valor mínimo deve ser menor ou igual ao máximo!');
+                return;
+            }
+
+            let numbers = [];
+            for (let i = minNumber; i <= maxNumber; i++) {
+                numbers.push(i);
+            }
+
+            if (lastNumberWinner !== null && numbers.length > 1) {
+                numbers = numbers.filter(num => num !== lastNumberWinner);
+            }
+
+            drawButton.disabled = true;
+            audio.volume = 0.1; // Set volume to 10%
+            audio.play(); // Start audio immediately
+
+            // Show overlay immediately with "Sorteando..."
+            overlay.classList.add('active');
+            resultDiv.textContent = 'Sorteando...';
+            resultDiv.classList.add('roulette');
+            resultDiv.classList.remove('winner');
+
+            // Delay the shuffle by 5 seconds
+            setTimeout(() => {
+                let shuffleCount = 0;
+                const shuffleInterval = setInterval(() => {
+                    const randomNumber = numbers[Math.floor(Math.random() * numbers.length)];
+                    resultDiv.textContent = randomNumber;
+                    shuffleCount++;
+                    if (shuffleCount >= 100) {
+                        clearInterval(shuffleInterval);
+                    }
+                }, 50);
+
+                // Reveal winner after another 5 seconds (total 10 seconds from click)
+                setTimeout(() => {
+                    clearInterval(shuffleInterval);
+                    const winner = numbers[Math.floor(Math.random() * numbers.length)];
+                    lastNumberWinner = winner;
+                    resultDiv.textContent = `Sorteado: ${winner}!`;
+                    resultDiv.classList.remove('roulette');
+                    resultDiv.classList.add('winner');
+                    drawButton.disabled = false;
+                    audio.pause(); // Stop audio when winner is revealed
+                    audio.currentTime = 0; // Reset audio for next play
+                }, 5000);
+            }, 10000);
+        }
+
+        function closeOverlay(event) {
+            const overlay = document.getElementById('overlay');
+            overlay.classList.remove('active');
+        }
+    </script>
+</body>
+</html>
