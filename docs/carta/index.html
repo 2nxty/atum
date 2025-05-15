@@ -1,1 +1,384 @@
-tigris
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tigris Simulator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: url('img/bg.jpg') no-repeat center/cover;
+            margin: 0;
+            padding: 20px;
+            color: #ffffff;
+            overflow: hidden;
+        }
+        #game-container {
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 450px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #balance {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #66ccff;
+            text-shadow: 0 0 5px rgba(102, 204, 255, 0.5);
+        }
+        #slots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(40, 40, 40, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            height: 270px;
+        }
+        .column {
+            width: 90px;
+            height: 270px;
+            overflow: hidden;
+            position: relative;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.3));
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .slot-strip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            transition: transform 0.5s ease-out;
+        }
+        .slot {
+            font-size: 50px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2), rgba(50, 50, 50, 0.8));
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            margin: 5px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 0 5px rgba(255, 255, 255, 0.1);
+        }
+        .spinning .slot-strip {
+            animation: spinVertical 0.1s linear infinite;
+        }
+        @keyframes spinVertical {
+            0% { transform: translateY(-180px); }
+            100% { transform: translateY(180px); }
+        }
+        #bet-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        #bet-input, #add-balance-input {
+            padding: 10px;
+            font-size: 16px;
+            background: rgba(50, 50, 50, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            width: 120px;
+            transition: border-color 0.3s;
+        }
+        #bet-input:focus, #add-balance-input:focus {
+            border-color: #66ccff;
+            outline: none;
+        }
+        button {
+            padding: 12px 30px;
+            font-size: 16px;
+            background: #0078d4;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+        button:hover {
+            background: #005ea2;
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: rgba(80, 80, 80, 0.7);
+            cursor: not-allowed;
+            transform: none;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #ff6666;
+            text-shadow: 0 0 5px rgba(255, 102, 102, 0.5);
+        }
+        #add-balance-btn {
+            background: #00cc99;
+            margin-left: 10px;
+        }
+        #add-balance-btn:hover {
+            background: #00b386;
+        }
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        #modal-content {
+            background: rgba(40, 40, 40, 0.95);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        #modal-content button {
+            margin-top: 15px;
+        }
+        #modal-content .close-btn {
+            background: #ff6666;
+        }
+        #modal-content .close-btn:hover {
+            background: #cc5252;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="balance">Saldo: $<span id="money">1000</span></div>
+        <div id="slots">
+            <div class="column" id="col0">
+                <div class="slot-strip">
+                    <div class="slot">🎰</div>
+                    <div class="slot">🎰</div>
+                    <div class="slot">🎰</div>
+                    <div class="slot">🎰</div>
+                </div>
+            </div>
+            <div class="column" id="col1">
+                <div class="slot-strip">
+                    <div class="slot">🎰</div>
+                    <div class="slot">🎰</div>
+                    <div class="slot">🎰</div>
+                    <div class="slot">🎰</div>
+                </div>
+            </div>
+            <div class="column" id="col2">
+                <div class="slot-strip">
+                    <div class="slot">🎰</div>
+                    <div class="slot">🎰</div>
+                    <div class="slot">🎰</div>
+                    <div class="slot">🎰</div>
+                </div>
+            </div>
+        </div>
+        <div id="bet-container">
+            <input type="number" id="bet-input" min="1" max="1000" value="10">
+            <button id="spin-btn">Girar</button>
+            <button id="add-balance-btn" hidden>Adicionar Saldo</button>
+        </div>
+        <div id="message"></div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal">
+        <div id="modal-content">
+            <h2>Adicionar Saldo</h2>
+            <input type="number" id="add-balance-input" min="1" max="1000" placeholder="Máximo 1000" value="100">
+            <div>
+                <button id="confirm-add-btn">Confirmar</button>
+                <button class="close-btn" id="close-modal-btn">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const emojis = ['🍒', '🍋', '🍊', '🍇', '🔔', '⭐'];
+        const multipliers = {
+            '🍇': 1.5,  // Uva
+            '🍋': 2,    // Limão
+            '🍊': 2.5,  // Laranja
+            '🍒': 3,    // Cereja
+            '🔔': 5,    // Sino
+            '⭐': 10     // Estrela
+        };
+        let balance = 1000;
+        const balanceDisplay = document.getElementById('money');
+        const columns = Array.from(document.getElementsByClassName('column'));
+        const slotStrips = Array.from(document.getElementsByClassName('slot-strip'));
+        const betInput = document.getElementById('bet-input');
+        const spinBtn = document.getElementById('spin-btn');
+        const addBalanceBtn = document.getElementById('add-balance-btn');
+        const message = document.getElementById('message');
+        const modal = document.getElementById('modal');
+        const addBalanceInput = document.getElementById('add-balance-input');
+        const confirmAddBtn = document.getElementById('confirm-add-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        function updateBalance() {
+            balanceDisplay.textContent = balance.toFixed(2); // Mostra 2 casas decimais
+        }
+
+        function spin() {
+            const bet = parseInt(betInput.value);
+            
+            if (bet <= 0 || isNaN(bet)) {
+                message.textContent = "Insira uma aposta válida!";
+                return;
+            }
+
+            if (bet > balance) {
+                message.textContent = "Saldo insuficiente!";
+                return;
+            }
+
+            spinBtn.disabled = true;
+            balance -= bet;
+            updateBalance();
+            message.textContent = "";
+
+            columns.forEach(col => col.classList.add('spinning'));
+            let spins = 0;
+            const spinInterval = setInterval(() => {
+                slotStrips.forEach(strip => {
+                    const slots = strip.getElementsByClassName('slot');
+                    for (let slot of slots) {
+                        slot.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    }
+                });
+                spins++;
+
+                if (spins >= 20) {
+                    clearInterval(spinInterval);
+                    stopSpinning();
+                }
+            }, 100);
+        }
+
+        function stopSpinning() {
+            columns.forEach((col, index) => {
+                setTimeout(() => {
+                    col.classList.remove('spinning');
+                    const strip = col.querySelector('.slot-strip');
+                    strip.style.transform = 'translateY(0)';
+                }, index * 300);
+            });
+            setTimeout(() => checkWin(parseInt(betInput.value)), 900);
+            spinBtn.disabled = false;
+        }
+
+        function checkWin(bet) {
+            const grid = [];
+            slotStrips.forEach(strip => {
+                const slots = Array.from(strip.getElementsByClassName('slot'));
+                grid.push(slots.map(slot => slot.textContent));
+            });
+            const flatGrid = [
+                grid[0][1], grid[1][1], grid[2][1], // Linha do meio
+                grid[0][0], grid[1][0], grid[2][0],
+                grid[0][2], grid[1][2], grid[2][2]
+            ];
+
+            const wins = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Linhas
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Colunas
+                [0, 4, 8], [2, 4, 6]             // Diagonais
+            ];
+
+            let won = false;
+            let winningEmoji = null;
+            for (const [a, b, c] of wins) {
+                if (flatGrid[a] === flatGrid[b] && flatGrid[b] === flatGrid[c]) {
+                    won = true;
+                    winningEmoji = flatGrid[a];
+                    break;
+                }
+            }
+
+            if (won) {
+                const multiplier = multipliers[winningEmoji];
+                const winnings = bet * multiplier;
+                balance += winnings;
+                message.textContent = `Você ganhou $${winnings.toFixed(2)} (${multiplier}x com ${winningEmoji})!`;
+                message.style.color = '#66ccff';
+            } else {
+                message.textContent = "Tente novamente!";
+                message.style.color = '#ff6666';
+            }
+            updateBalance();
+
+            if (balance <= 0) {
+                message.textContent = "Sem saldo! Adicione mais.";
+                spinBtn.disabled = true;
+            }
+        }
+
+        // Modal Functions
+        function openModal() {
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            addBalanceInput.value = 100;
+        }
+
+        function addBalance() {
+            const amount = parseInt(addBalanceInput.value);
+            if (isNaN(amount) || amount <= 0) {
+                message.textContent = "Insira um valor válido!";
+                closeModal();
+                return;
+            }
+            if (amount > 1000) {
+                message.textContent = "O valor máximo é 1000!";
+                closeModal();
+                return;
+            }
+            balance += amount;
+            updateBalance();
+            message.textContent = `$${amount} adicionado ao saldo!`;
+            message.style.color = '#66ccff';
+            spinBtn.disabled = false;
+            closeModal();
+        }
+
+        // Event Listeners
+        spinBtn.addEventListener('click', spin);
+        betInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') spin();
+        });
+        addBalanceBtn.addEventListener('click', openModal);
+        confirmAddBtn.addEventListener('click', addBalance);
+        closeModalBtn.addEventListener('click', closeModal);
+        addBalanceInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addBalance();
+        });
+
+        // Inicializa o saldo
+        updateBalance();
+    </script>
+</body>
+</html>
